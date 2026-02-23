@@ -1,0 +1,12 @@
+{
+  "name": "@shared/federation-config",
+  "version": "1.0.0",
+  "description": "Centralised Native Federation sharing config for all MFEs. Publish a new version to update shared library settings across every MFE without touching individual repos.",
+  "main": "index.js",
+  "scripts": {
+    "publish:local": "npm publish --registry http://localhost:4873",
+    "publish:github": "npm publish --registry https://npm.pkg.github.com"
+  },
+  "keywords": ["federation", "mfe", "shared-config"],
+  "license": "MIT"
+}

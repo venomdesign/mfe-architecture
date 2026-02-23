@@ -122,6 +122,13 @@ pids/
 *.pid.lock
 
 # ---------------------------
+# federation-config package
+# ---------------------------
+# This package is published to a private registry in production.
+# The node_modules here are only present when testing locally via file: path.
+federation-config/node_modules/
+
+# ---------------------------
 # Miscellaneous
 # ---------------------------
 *.tgz

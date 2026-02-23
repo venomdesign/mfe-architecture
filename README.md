@@ -16,9 +16,10 @@ A reference implementation of a **Micro-Frontend (MFE) architecture** using Angu
 8. [Component Library Showcase](#8-component-library-showcase)
 9. [Shell App](#9-shell-app)
 10. [Micro-Frontends](#10-micro-frontends)
-11. [Overriding MFEs with One Shared Version of the Component Library](#11-overriding-mfes-with-one-shared-version-of-the-component-library)
+11. [Centralised Federation Config — @shared/federation-config](#11-centralised-federation-config--sharedfederation-config)
 12. [Development Workflow](#12-development-workflow)
 13. [Port Reference](#13-port-reference)
+14. [Singleton Mode — Forcing All MFEs onto One Shared Version](#14-singleton-mode--forcing-all-mfes-onto-one-shared-version)
 
 ---
 
@@ -485,71 +486,148 @@ Each MFE can also be opened directly in a browser at its own port for standalone
 
 ---
 
-## 11. Overriding MFEs with One Shared Version of the Component Library
+## 11. Centralised Federation Config — @shared/federation-config
 
-By default, each MFE bundles its **own independent copy** of `@shared/component-library` (`singleton: false`). This is intentional — it lets different MFEs run different versions without conflict.
+### The problem
 
-However, you may want all MFEs and the shell to share **a single instance** of the component library (e.g. to reduce bundle size, or to enforce a consistent version across the entire application). This is done by switching the library to **singleton mode**.
+Each MFE lives in its own repository. Every `federation.config.js` contains the same shared library settings (`singleton`, `strictVersion`, `requiredVersion`). When you need to change those settings — for example to enforce a new version of `@shared/component-library` across all teams — you must open a pull request in **every single MFE repo**. That is N repos × 1 PR each, all for an identical one-line change.
 
-### What changes
+### The solution
 
-You need to update `federation.config.js` in **three places**:
+`@shared/federation-config` is a **standalone npm package** (its own git repo, published to your private registry) that exports the shared library config. Every MFE installs it and spreads it into `federation.config.js`. To update shared library settings across all MFEs, you change **one file**, publish one new version, and CI/CD handles the rest — **zero PRs in MFE repos**.
 
-1. `shell-app/federation.config.js`
-2. `mfe-dashboard/federation.config.js`
-3. `mfe-settings/federation.config.js`
+```
+┌──────────────────────────────────────────────────────────────┐
+│         @shared/federation-config  (own repo + registry)     │
+│                       index.js                               │
+│  sharedLibraries: { '@shared/component-library': { ... } }   │
+└──────────────────────────┬───────────────────────────────────┘
+                           │  published to private registry
+              ┌────────────┼────────────┐
+              │            │            │
+              ▼            ▼            ▼
+       shell-app     mfe-dashboard  mfe-settings
+   (separate repo) (separate repo) (separate repo)
+   "latest"         "latest"        "latest"
+        │                │               │
+        └────────────────┴───────────────┘
+        npm install → picks up latest → new config applied
+        No PR needed in any MFE repo
+```
 
-### The change
+### How each MFE uses it
 
-In each of the three files, find the `@shared/component-library` entry and change:
+Each `federation.config.js` now looks like this:
 
 ```js
-// BEFORE — each MFE uses its own copy
-'@shared/component-library': {
-  singleton: false,
-  strictVersion: false,
-  requiredVersion: 'auto'
+const { withNativeFederation, shareAll } = require('@angular-architects/native-federation/config');
+const { sharedLibraries } = require('@shared/federation-config');
+
+module.exports = withNativeFederation({
+  name: 'mfe-dashboard',
+  exposes: { './Component': './src/app/app.component.ts' },
+
+  shared: {
+    // Angular core — always singleton, managed per-repo (not centralised)
+    ...shareAll({ singleton: true, strictVersion: true, requiredVersion: 'auto' }),
+
+    // ── Central shared library config ────────────────────────────────────────
+    // All settings come from @shared/federation-config.
+    // Change that package → publish → all MFEs pick it up on next npm install.
+    ...sharedLibraries,
+
+    // ── Per-MFE override (optional) ──────────────────────────────────────────
+    // Uncomment to override a specific library for THIS MFE only.
+    // This entry wins because it comes AFTER the ...sharedLibraries spread.
+    // '@shared/component-library': { singleton: false, strictVersion: false, requiredVersion: '1.2.0' },
+  },
+
+  skip: ['rxjs/ajax', 'rxjs/fetch', 'rxjs/testing', 'rxjs/webSocket'],
+  features: { ignoreUnusedDeps: true }
+});
+```
+
+### The one file you ever change
+
+`federation-config/index.js` (in the `@shared/federation-config` repo):
+
+```js
+module.exports = {
+  sharedLibraries: {
+    '@shared/component-library': {
+      singleton: false,      // ← change this to true to enforce singleton across all MFEs
+      strictVersion: false,
+      requiredVersion: 'auto',
+    },
+    // Add more shared libraries here as your platform grows:
+    // '@shared/state-library': { singleton: false, strictVersion: false, requiredVersion: 'auto' },
+  },
+};
+```
+
+### Workflow — updating all MFEs at once
+
+```
+1. Edit federation-config/index.js
+   └─ e.g. change singleton: false → true
+
+2. Bump version in federation-config/package.json
+   └─ e.g. 1.0.0 → 1.1.0
+
+3. Publish to private registry
+   └─ npm publish --registry https://your-registry.example.com
+
+4. Done — no PRs needed in any MFE repo.
+   Each MFE's CI/CD pipeline runs `npm install` on next build,
+   fetches `latest`, and the new config is applied automatically.
+```
+
+### Per-MFE independence is preserved
+
+MFEs remain fully independent. Any MFE can override a specific library by adding an entry **after** the `...sharedLibraries` spread in its own `federation.config.js`. The local entry wins because JavaScript object spread is last-write-wins:
+
+```js
+shared: {
+  ...shareAll({ singleton: true, strictVersion: true, requiredVersion: 'auto' }),
+  ...sharedLibraries,                    // central defaults from the package
+  '@shared/component-library': {         // this MFE's local override
+    singleton: false,
+    strictVersion: false,
+    requiredVersion: '1.2.0',            // pinned to a specific version
+  },
 }
 ```
 
-```js
-// AFTER — all MFEs share one instance (negotiated by the federation runtime)
-'@shared/component-library': {
-  singleton: true,
-  strictVersion: true,
-  requiredVersion: 'auto'
-}
-```
+### Installing the package
 
-### How singleton resolution works
-
-When `singleton: true`, the Native Federation runtime negotiates which version to use at load time:
-
-1. The shell and each MFE each declare the version of `@shared/component-library` they were built with (via `requiredVersion: 'auto'`, which reads from `package.json`).
-2. The federation runtime picks the **highest compatible version** and loads it once.
-3. All other remotes reuse that single loaded instance instead of loading their own copy.
-
-With `strictVersion: true`, if a remote requires a version that is **incompatible** with the negotiated singleton version, the federation runtime will throw an error at load time rather than silently loading a mismatched version.
-
-### Ensuring all projects use the same version
-
-For singleton mode to work cleanly, all projects should reference the same built version of the library. Since all projects currently use a `file:` path reference, they all point to the same `dist/` folder — so they are always in sync as long as you rebuild the library before restarting the apps.
+#### Production — private registry
 
 ```bash
-# 1. Rebuild the library
-cd component-library && npm run build
+# Add to .npmrc in each MFE repo:
+@shared:registry=https://your-private-registry.example.com
 
-# 2. Re-install in each consuming project (picks up the new build)
-cd ../mfe-dashboard && npm install
-cd ../mfe-settings && npm install
-cd ../shell-app && npm install
-
-# 3. Restart all three servers
+# Install:
+npm install --save-dev @shared/federation-config@latest
 ```
 
-### Reverting to independent versions
+#### Local development — file path (this demo)
 
-To go back to each MFE using its own copy, set `singleton: false` and `strictVersion: false` in all three `federation.config.js` files.
+```bash
+npm install --save-dev file:../federation-config
+```
+
+#### Registry options
+
+| Registry | Best for | Notes |
+|---|---|---|
+| [Verdaccio](https://verdaccio.org/) | Self-hosted / local | `npx verdaccio` to start |
+| [GitHub Packages](https://docs.github.com/en/packages) | GitHub orgs | Requires PAT in `.npmrc` |
+| [Azure Artifacts](https://azure.microsoft.com/en-us/products/devops/artifacts) | Azure DevOps | Feed URL + PAT |
+| npm private | Public npm with private packages | `npm login` |
+
+### Why you cannot avoid this package for separate repos
+
+The federation protocol is a **build-time contract**. Each repo must declare its own sharing config when it is compiled — there is no runtime injection mechanism. The `@shared/federation-config` package is the only way to centralise that config across separate repos while keeping each repo independently deployable.
 
 ---
 
@@ -615,4 +693,73 @@ To go back to each MFE using its own copy, set `singleton: false` and `strictVer
 | `mfe-settings` | 4202 | http://localhost:4202 |
 | `mfe-dashboard` remoteEntry | 4201 | http://localhost:4201/remoteEntry.json |
 | `mfe-settings` remoteEntry | 4202 | http://localhost:4202/remoteEntry.json |
+
+---
+
+## 14. Singleton Mode — Forcing All MFEs onto One Shared Version
+
+By default, `@shared/federation-config` sets `singleton: false` — each MFE bundles its own independent copy of every shared library. This is the safe default: different MFEs can run different versions without conflict.
+
+When you want all MFEs and the shell to share **a single instance** of a library (e.g. to reduce bundle size or enforce a consistent version), switch to singleton mode via `@shared/federation-config`.
+
+### How to enable singleton mode (the centralised way)
+
+Edit `federation-config/index.js` — the **one file** that controls all MFEs:
+
+```js
+// federation-config/index.js
+module.exports = {
+  sharedLibraries: {
+    '@shared/component-library': {
+      singleton: true,       // ← was false
+      strictVersion: true,   // ← was false — throws if version mismatch
+      requiredVersion: 'auto',
+    },
+  },
+};
+```
+
+Then publish and let CI/CD propagate (see [Section 11](#11-centralised-federation-config--sharedfederation-config)).
+
+### How singleton resolution works at runtime
+
+When `singleton: true`, the Native Federation runtime negotiates which version to use at load time:
+
+1. The shell and each MFE each declare the version they were built with (`requiredVersion: 'auto'` reads from their own `package.json`).
+2. The federation runtime picks the **highest compatible version** and loads it once.
+3. All other remotes reuse that single loaded instance.
+
+With `strictVersion: true`, if a remote requires a version **incompatible** with the negotiated singleton, the runtime throws at load time rather than silently loading a mismatched version.
+
+### Ensuring all MFEs are on the same version
+
+For singleton mode to work cleanly, all MFEs must have the same version of the library installed. Update `package.json` in each MFE repo to reference the same version, then run `npm install`.
+
+```bash
+# In each MFE repo — update to the same version
+npm install @shared/component-library@1.2.0
+
+# Restart all servers after reinstalling
+```
+
+### Reverting to independent versions
+
+To go back to each MFE using its own copy, update `federation-config/index.js`:
+
+```js
+'@shared/component-library': {
+  singleton: false,
+  strictVersion: false,
+  requiredVersion: 'auto',
+},
+```
+
+Publish the new version — all MFEs revert on next `npm install` in CI/CD.
+
+### Comparison
+
+| Mode | `singleton` | Bundle size | Version flexibility | Use when |
+|---|---|---|---|---|
+| Independent (default) | `false` | Larger (each MFE bundles its own copy) | Each MFE can use a different version | Teams upgrade independently |
+| Singleton | `true` | Smaller (one shared copy) | All MFEs must use the same version | Enforcing a platform-wide version |
 
