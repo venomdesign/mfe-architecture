@@ -325,6 +325,45 @@ cd shell-app && npm start
 
 Then open **http://localhost:4200** in your browser. The shell will load the Dashboard and Settings MFEs on demand when you navigate to those routes.
 
+### Hot-reload development setup (component library changes)
+
+All consuming projects (`component-library-showcase`, `mfe-dashboard`, `mfe-settings`) reference the component library via a `file:` path in their `package.json`. npm resolves `file:` paths as **symlinks** on all platforms:
+
+```
+component-library-showcase/node_modules/@shared/component-library  → component-library/dist/
+mfe-dashboard/node_modules/@shared/component-library               → component-library/dist/
+mfe-settings/node_modules/@shared/component-library                → component-library/dist/
+```
+
+Angular's esbuild-based dev server follows symlinks and watches the files behind them. This means:
+
+> **Run `npm run build:watch` in the component library once. All four dev servers hot-reload automatically whenever you save a library source file — no `npm install` needed between changes.**
+
+Open **five terminals** for the full hot-reload stack:
+
+```bash
+# Terminal 1 — one watch process feeds ALL consumers simultaneously
+cd component-library && npm run build:watch
+
+# Terminal 2
+cd component-library-showcase && npm start   # hot-reloads via symlink
+
+# Terminal 3
+cd mfe-dashboard && npm start                # hot-reloads via symlink
+
+# Terminal 4
+cd mfe-settings && npm start                 # hot-reloads via symlink
+
+# Terminal 5
+cd shell-app && npm start                    # loads MFEs at runtime
+```
+
+**Flow:** edit `component-library/src/` → ng-packagr rebuilds to `dist/` → all four dev servers detect the changed files through their symlinks → hot-reload in parallel.
+
+**When `npm install` IS still needed** (symlink breaks):
+- After deleting `node_modules/` in any consuming project and reinstalling from scratch
+- After cloning the repo for the first time (see [Section 5](#5-first-time-setup))
+
 ---
 
 ## 7. Component Library
@@ -359,12 +398,18 @@ npm run build:watch
 
 ### After rebuilding
 
-If you change the library source and rebuild, consuming projects need to re-install to pick up the new build:
+If you are running `npm run build:watch` alongside the consuming project's dev server, changes propagate automatically through the npm symlink — **no `npm install` needed**.
+
+`npm install` is only required in a consuming project if:
+- You deleted its `node_modules/` and are reinstalling from scratch
+- You cloned the repo for the first time
 
 ```bash
-# In each consuming project directory:
-npm install
+# Only needed after a fresh clone or node_modules deletion:
+cd mfe-dashboard && npm install
 ```
+
+See [Hot-reload development setup](#hot-reload-development-setup-component-library-changes) in Section 6 for the full workflow.
 
 ---
 
