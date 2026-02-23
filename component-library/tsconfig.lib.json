@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "declarationDir": ".",
+    "inlineSources": true,
+    "types": []
+  },
+  "exclude": [
+    "**/*.spec.ts",
+    "node_modules"
+  ]
+}

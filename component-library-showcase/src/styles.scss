@@ -1,0 +1,102 @@
+/* Global styles for the component library showcase */
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #f8f9fa;
+}
+
+/* Sidebar layout */
+.showcase-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.showcase-sidebar {
+  width: 260px;
+  min-width: 260px;
+  background: #1a1d23;
+  color: #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: 100;
+}
+
+.showcase-main {
+  margin-left: 260px;
+  flex: 1;
+  min-height: 100vh;
+  padding: 2rem;
+}
+
+/* Sidebar nav links */
+.sidebar-nav .nav-link {
+  color: #94a3b8;
+  padding: 0.6rem 1.25rem;
+  border-radius: 6px;
+  margin: 2px 8px;
+  font-size: 0.9rem;
+  transition: all 0.15s ease;
+
+  &:hover {
+    color: #fff;
+    background: rgba(255,255,255,0.08);
+  }
+
+  &.active {
+    color: #fff;
+    background: rgba(99, 102, 241, 0.3);
+    border-left: 3px solid #6366f1;
+  }
+
+  i { width: 20px; }
+}
+
+/* Code blocks */
+.code-block {
+  background: #1e293b;
+  color: #e2e8f0;
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  overflow-x: auto;
+  white-space: pre;
+}
+
+/* Section headers */
+.section-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #64748b;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+/* Component preview boxes */
+.preview-box {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+/* Version badge in sidebar */
+.version-badge {
+  display: inline-block;
+  background: rgba(99, 102, 241, 0.2);
+  color: #818cf8;
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
