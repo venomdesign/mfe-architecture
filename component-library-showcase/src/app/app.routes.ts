@@ -4,6 +4,8 @@ import { ButtonsComponent } from './pages/buttons/buttons.component';
 import { BadgesComponent } from './pages/badges/badges.component';
 import { CardsComponent } from './pages/cards/cards.component';
 import { AlertsComponent } from './pages/alerts/alerts.component';
+import { GridShowcaseComponent } from './pages/grid/grid.component';
+import { ScheduleShowcaseComponent } from './pages/schedule/schedule.component';
 
 export const routes: Routes = [
   {
@@ -30,5 +32,13 @@ export const routes: Routes = [
   {
     path: 'alerts',
     component: AlertsComponent
+  },
+  {
+    path: 'grid',
+    component: GridShowcaseComponent
+  },
+  {
+    path: 'schedule',
+    component: ScheduleShowcaseComponent
   }
 ];
