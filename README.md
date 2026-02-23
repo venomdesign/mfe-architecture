@@ -38,7 +38,7 @@ A reference implementation of a **Micro-Frontend (MFE) architecture** using Angu
 │  component-  │ │mfe-dashboard│  │  mfe-settings │
 │   library-   │ │  :4201      │  │    :4202      │
 │  showcase    │ │  (remote)   │  │   (remote)    │
-│  :4200       │ └──────┬──────┘  └───────┬───────┘
+│  :4300       │ └──────┬──────┘  └───────┬───────┘
 └──────────────┘        │                 │
   (standalone,          │  Native Federation
    no federation)       │  remoteEntry.json
@@ -272,7 +272,7 @@ cd component-library-showcase
 npm start          # or: ng serve
 ```
 
-- Runs at **http://localhost:4200**
+- Runs at **http://localhost:4300**
 - To stop: `Ctrl + C`
 
 ### Shell App
@@ -284,8 +284,6 @@ npm start          # or: ng serve
 
 - Runs at **http://localhost:4200**
 - To stop: `Ctrl + C`
-
-> ⚠️ The shell and the showcase both default to port 4200. Run only one at a time, or pass `--port` to override.
 
 ### MFE Dashboard
 
@@ -373,7 +371,7 @@ npm install
 
 **Location:** `component-library-showcase/`  
 **Purpose:** A standalone Angular application that visually documents every component in the library.  
-**Port:** `4200`
+**Port:** `4300`
 
 ### Routes
 
@@ -392,7 +390,7 @@ cd component-library-showcase
 npm start
 ```
 
-Open **http://localhost:4200**
+Open **http://localhost:4300**
 
 > The showcase is a **regular Angular app** — it has no federation config and is completely independent of the shell and MFEs.
 
@@ -612,10 +610,9 @@ To go back to each MFE using its own copy, set `singleton: false` and `strictVer
 | Project | Port | URL |
 |---|---|---|
 | `shell-app` | 4200 | http://localhost:4200 |
-| `component-library-showcase` | 4200 | http://localhost:4200 |
+| `component-library-showcase` | 4300 | http://localhost:4300 |
 | `mfe-dashboard` | 4201 | http://localhost:4201 |
 | `mfe-settings` | 4202 | http://localhost:4202 |
 | `mfe-dashboard` remoteEntry | 4201 | http://localhost:4201/remoteEntry.json |
 | `mfe-settings` remoteEntry | 4202 | http://localhost:4202/remoteEntry.json |
 
-> `shell-app` and `component-library-showcase` both use port 4200. Run only one at a time, or start one with a custom port: `ng serve --port 4205`
