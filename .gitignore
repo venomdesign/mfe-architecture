@@ -29,6 +29,11 @@ bazel-out/
 component-library/dist/
 
 # ---------------------------
+# Compodoc Generated Docs
+# ---------------------------
+component-library-showcase/public/docs/
+
+# ---------------------------
 # Module Federation
 # ---------------------------
 # Uncomment if you generate federation manifests at build time

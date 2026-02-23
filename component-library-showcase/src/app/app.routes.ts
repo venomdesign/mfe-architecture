@@ -6,6 +6,7 @@ import { CardsComponent } from './pages/cards/cards.component';
 import { AlertsComponent } from './pages/alerts/alerts.component';
 import { GridShowcaseComponent } from './pages/grid/grid.component';
 import { ScheduleShowcaseComponent } from './pages/schedule/schedule.component';
+import { ApiDocsComponent } from './pages/api-docs/api-docs.component';
 
 export const routes: Routes = [
   {
@@ -40,5 +41,9 @@ export const routes: Routes = [
   {
     path: 'schedule',
     component: ScheduleShowcaseComponent
+  },
+  {
+    path: 'api-docs',
+    component: ApiDocsComponent
   }
 ];

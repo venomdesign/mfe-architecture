@@ -1,0 +1,13 @@
+{
+  "tsconfig": "./tsconfig.json",
+  "output": "../component-library-showcase/public/docs",
+  "name": "@shared/component-library",
+  "theme": "material",
+  "disablePrivate": true,
+  "disableInternal": true,
+  "disableProtected": false,
+  "disableRoutesGraph": true,
+  "hideGenerator": true,
+  "silent": false,
+  "language": "en-US"
+}

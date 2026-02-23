@@ -1,16 +1,14 @@
-# Syncfusion Angular v29 Integration TODO
+# Compodoc Integration TODO
 
-## component-library
-- [x] Plan approved
-- [x] npm install @syncfusion/ej2-angular-grids@^29 @syncfusion/ej2-angular-schedule@^29
-- [x] Create src/lib/grid/ui-grid.component.ts
-- [x] Create src/lib/schedule/ui-schedule.component.ts
-- [x] Update src/public-api.ts
+## Tasks
 
-## component-library-showcase
-- [x] npm install @syncfusion/ej2-angular-grids@^29 @syncfusion/ej2-angular-schedule@^29
-- [x] Update angular.json styles (Syncfusion Material CSS)
-- [x] Create src/app/pages/grid/grid.component.ts
-- [x] Create src/app/pages/schedule/schedule.component.ts
-- [x] Update app.routes.ts
-- [x] Update app.component.ts (nav links)
+- [x] Read existing files (component-library/package.json, tsconfig.json, app.component.ts, app.routes.ts)
+- [x] Install @compodoc/compodoc in component-library
+- [x] Create component-library/.compodocrc.json
+- [x] Update component-library/package.json with docs scripts
+- [x] Create component-library-showcase/src/app/pages/api-docs/api-docs.component.ts
+- [x] Update component-library-showcase/src/app/app.routes.ts (add /api-docs)
+- [x] Update component-library-showcase/src/app/app.component.ts (add nav link)
+- [x] Run npm run docs in component-library to generate static docs
+- [x] Add component-library-showcase/public/docs/ to .gitignore
+- [x] Verify docs generated at component-library-showcase/public/docs/index.html ✅

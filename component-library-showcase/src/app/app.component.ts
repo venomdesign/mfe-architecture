@@ -56,6 +56,16 @@ import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
           <a routerLink="/schedule" routerLinkActive="active" class="nav-link d-flex align-items-center gap-2">
             <i class="bi bi-calendar3"></i> Schedule
           </a>
+
+          <div class="px-4 mt-3 mb-2">
+            <span class="text-uppercase text-secondary" style="font-size:0.7rem;letter-spacing:.08em;font-weight:700">
+              Documentation
+            </span>
+          </div>
+
+          <a routerLink="/api-docs" routerLinkActive="active" class="nav-link d-flex align-items-center gap-2">
+            <i class="bi bi-file-earmark-code"></i> API Docs
+          </a>
         </nav>
 
         <div class="p-4 border-top border-secondary border-opacity-25">
