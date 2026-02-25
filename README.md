@@ -433,7 +433,7 @@ See [Hot-reload development setup](#hot-reload-development-setup-component-libra
 ## 8. Component Library Showcase
 
 **Location:** `component-library-showcase/`  
-**Purpose:** A standalone Angular application that visually documents every component in the library.  
+**Purpose:** A standalone Angular application that visually documents every component in the library. Includes a live Compodoc API reference embedded directly in the app.  
 **Port:** `4300`
 
 ### Routes
@@ -445,6 +445,9 @@ See [Hot-reload development setup](#hot-reload-development-setup-component-libra
 | `/badges` | `UiBadgeComponent` examples |
 | `/cards` | `UiCardComponent` examples |
 | `/alerts` | `UiAlertComponent` examples |
+| `/grid` | `UiGridComponent` examples |
+| `/schedule` | `UiScheduleComponent` examples |
+| `/api-docs` | Compodoc API reference (embedded iframe) |
 
 ### Start
 
@@ -453,7 +456,78 @@ cd component-library-showcase
 npm start
 ```
 
-Open **http://localhost:4300**
+`npm start` does two things in sequence:
+
+1. **Builds the Compodoc docs** — runs `compodoc` inside `component-library/` and writes the static output to `component-library-showcase/public/docs/`
+2. **Starts the Angular dev server** — serves the showcase at **http://localhost:4300**
+
+Once running, navigate to **http://localhost:4300/api-docs** to see the full Compodoc API reference embedded in the showcase.
+
+> **Skip the docs build** — if the docs are already up to date and you want a faster startup, use:
+> ```bash
+> npm run start:fast   # skips docs:build, runs ng serve directly
+> ```
+
+### How the API Docs work
+
+```
+component-library/src/          ← source files with JSDoc comments
+        │
+        ▼  npm run docs:build
+        │  (runs compodoc via component-library/.compodocrc.json)
+        │
+component-library-showcase/public/docs/   ← static Compodoc output (index.html + assets)
+        │
+        ▼  angular.json assets glob: "public/**/*"
+        │  (Angular dev server copies public/ to the served root)
+        │
+http://localhost:4300/docs/index.html     ← served as a static file
+        │
+        ▼  ApiDocsComponent
+        │  <iframe src="/docs/index.html">
+        │
+http://localhost:4300/api-docs            ← Compodoc rendered inside the showcase
+```
+
+### Rebuilding the docs manually
+
+If you update JSDoc comments in the component library and want to refresh the docs without restarting the showcase:
+
+```bash
+# From the component-library-showcase directory:
+npm run docs:build
+
+# Or directly from the component-library directory:
+cd ../component-library
+npm run docs
+```
+
+The updated static files are written to `public/docs/` immediately. Because Angular's dev server watches the `public/` directory, the iframe will reflect the new docs on the next page reload — **no server restart needed**.
+
+### Compodoc configuration
+
+The Compodoc build is controlled by `component-library/.compodocrc.json`:
+
+```json
+{
+  "tsconfig": "./tsconfig.json",
+  "output": "../component-library-showcase/public/docs",
+  "name": "@shared/component-library",
+  "theme": "material",
+  "disablePrivate": true,
+  "disableInternal": true,
+  "disableRoutesGraph": true,
+  "hideGenerator": true
+}
+```
+
+| Option | Effect |
+|---|---|
+| `output` | Writes directly into the showcase's `public/docs/` folder |
+| `theme: "material"` | Material Design theme for the Compodoc UI |
+| `disablePrivate` | Hides private class members from the docs |
+| `disableInternal` | Hides members tagged `@internal` |
+| `disableRoutesGraph` | Suppresses the Angular routes graph (not relevant for a library) |
 
 > The showcase is a **regular Angular app** — it has no federation config and is completely independent of the shell and MFEs.
 
