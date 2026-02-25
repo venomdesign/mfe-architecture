@@ -27,31 +27,32 @@ A reference implementation of a **Micro-Frontend (MFE) architecture** using Angu
 ## 1. Architecture Overview
 
 ```
-┌─────────────────────────────────────────────────────────────────────┐
-│                        component-library                            │
-│              @shared/component-library  (v1.0.0)                   │
-│   UiButton · UiBadge · UiCard · UiAlert  →  dist/component-library │
-└───────────────────────┬─────────────────────────────────────────────┘
-                        │  file: path reference (npm install)
-          ┌─────────────┼──────────────────┐
-          │             │                  │
-          ▼             ▼                  ▼
-┌──────────────┐ ┌─────────────┐  ┌───────────────┐
-│  component-  │ │mfe-dashboard│  │  mfe-settings │
-│   library-   │ │  :4201      │  │    :4202      │
-│  showcase    │ │  (remote)   │  │   (remote)    │
-│  :4300       │ └──────┬──────┘  └───────┬───────┘
-└──────────────┘        │                 │
-  (standalone,          │  Native Federation
-   no federation)       │  remoteEntry.json
-                        │                 │
-                        ▼                 ▼
-              ┌─────────────────────────────┐
-              │          shell-app          │
-              │           :4200             │
-              │  federation.manifest.json   │
-              │  loadRemoteModule(...)      │
-              └─────────────────────────────┘
+┌──────────────────────────────────┐  ┌──────────────────────────────────┐
+│         component-library        │  │         shared-state-lib         │
+│   @shared/component-library      │  │       @shared/state-lib          │
+│   UiButton · UiBadge · UiCard    │  │   AppStateService (signals)      │
+│   → dist/component-library       │  │   → dist/state-lib               │
+└────────────────┬─────────────────┘  └──────────────┬───────────────────┘
+                 │  file: path (npm install)          │  file: path (npm install)
+          ┌──────┴──────────────────────────┬─────────┴──────┐
+          │                                 │                │
+          ▼                                 ▼                ▼
+┌──────────────┐              ┌─────────────────┐  ┌───────────────┐
+│  component-  │              │  mfe-dashboard  │  │  mfe-settings │
+│   library-   │              │     :4201       │  │    :4202      │
+│  showcase    │              │    (remote)     │  │   (remote)    │
+│  :4300       │              └────────┬────────┘  └───────┬───────┘
+└──────────────┘                       │                   │
+  (standalone,                         │  Native Federation
+   no federation)                      │  remoteEntry.json
+                                       │                   │
+                                       ▼                   ▼
+                             ┌─────────────────────────────┐
+                             │          shell-app          │
+                             │           :4200             │
+                             │  federation.manifest.json   │
+                             │  loadRemoteModule(...)      │
+                             └─────────────────────────────┘
 ```
 
 **Key relationships:**
@@ -59,6 +60,7 @@ A reference implementation of a **Micro-Frontend (MFE) architecture** using Angu
 | Relationship | Mechanism |
 |---|---|
 | Component library → MFEs / Showcase | `file:` path in `package.json` (local npm install) |
+| State library → Shell / MFEs | `file:` path in `package.json` (local npm install) |
 | MFEs → Shell | Native Federation `remoteEntry.json` loaded at runtime |
 | Shell discovers MFEs | `public/federation.manifest.json` |
 | Shell lazy-loads MFE components | `loadRemoteModule('mfe-name', './Component')` |
@@ -193,18 +195,15 @@ The string `'mfe-dashboard'` matches the key in `federation.manifest.json`. The 
 
 All federation configs use `shareAll` for Angular core packages with `singleton: true` — this guarantees a single Angular instance across the shell and all MFEs (required for Angular to work correctly).
 
-The component library is configured separately with `singleton: false`:
+The component library and state library are configured separately via `@shared/federation-config` with `singleton: false`:
 
 ```js
-// shell-app/federation.config.js  (and each MFE's federation.config.js)
-'@shared/component-library': {
-  singleton: false,
-  strictVersion: false,
-  requiredVersion: 'auto'
-}
+// Sourced from federation-config/index.js — applies to ALL MFEs automatically
+'@shared/component-library': { singleton: false, strictVersion: false, requiredVersion: 'auto' },
+'@shared/state-lib':          { singleton: false, strictVersion: false, requiredVersion: 'auto' },
 ```
 
-`singleton: false` means each MFE **bundles and uses its own copy** of the component library independently. This allows different MFEs to run different versions of the library without conflict. See [Section 11](#11-overriding-mfes-with-one-shared-version-of-the-component-library) to change this behaviour.
+`singleton: false` means each MFE **bundles and uses its own copy** of each library independently. This allows different MFEs to run different versions without conflict. See [Section 15](#15-singleton-mode--forcing-all-mfes-onto-one-shared-version) to change this behaviour — singleton mode is especially important for `@shared/state-lib`, since only a singleton instance enables true cross-MFE state sharing.
 
 ---
 
@@ -264,7 +263,6 @@ cd ../mfe-settings
 npm install
 ```
 
-> If you ever rebuild either shared library, you must re-run `npm install` in every consuming project to pick up the updated build.
 
 ---
 
@@ -729,13 +727,23 @@ module.exports = withNativeFederation({
 ```js
 module.exports = {
   sharedLibraries: {
+    // ── Component Library ────────────────────────────────────────────────────
     '@shared/component-library': {
-      singleton: false,      // ← change this to true to enforce singleton across all MFEs
+      singleton: false,      // ← change to true to enforce singleton across all MFEs
       strictVersion: false,
       requiredVersion: 'auto',
     },
-    // Add more shared libraries here as your platform grows:
-    // '@shared/state-library': { singleton: false, strictVersion: false, requiredVersion: 'auto' },
+
+    // ── State Library ────────────────────────────────────────────────────────
+    // singleton: true is recommended for state — ensures all MFEs share one store
+    '@shared/state-lib': {
+      singleton: false,      // ← change to true to share one AppStateService instance
+      strictVersion: false,
+      requiredVersion: 'auto',
+    },
+
+    // ── Add more shared libraries here as your platform grows ─────────────────
+    // 'some-other-library': { singleton: false, strictVersion: false, requiredVersion: 'auto' },
   },
 };
 ```
@@ -830,12 +838,13 @@ The federation protocol is a **build-time contract**. Each repo must declare its
    cd mfe-newfeature
    ng add @angular-architects/native-federation --type remote --port 4203
    ```
-2. Add `@shared/component-library` to its `package.json` dependencies:
+2. Add the shared libraries to its `package.json` dependencies:
    ```json
-   "@shared/component-library": "file:../component-library/dist/component-library"
+   "@shared/component-library": "file:../component-library/dist/component-library",
+   "@shared/state-lib": "file:../shared-state-lib/dist/state-lib"
    ```
 3. Run `npm install` in the new MFE.
-4. Configure `federation.config.js` to expose the root component.
+4. Configure `federation.config.js` to expose the root component — the `...sharedLibraries` spread already covers both shared libraries automatically.
 5. Register the new MFE in `shell-app/public/federation.manifest.json`:
    ```json
    "mfe-newfeature": "http://localhost:4203/remoteEntry.json"
@@ -855,6 +864,13 @@ The federation protocol is a **build-time contract**. Each repo must declare its
 2. Rebuild: `npm run build`
 3. Re-install in all consuming projects: `npm install`
 4. If using singleton mode, ensure all `requiredVersion` values are consistent (or leave as `'auto'`)
+
+### Updating the state library version
+
+1. Update the `version` field in `shared-state-lib/package.json`
+2. Rebuild: `npm run build`
+3. Re-install in all consuming projects (`shell-app`, `mfe-dashboard`, `mfe-settings`): `npm install`
+4. If using singleton mode (`singleton: true` in `federation-config/index.js`), all consuming projects must be on the same version — leave `requiredVersion: 'auto'` and ensure all `package.json` files reference the same built dist
 
 ---
 
@@ -890,11 +906,16 @@ module.exports = {
       strictVersion: true,   // ← was false — throws if version mismatch
       requiredVersion: 'auto',
     },
+    '@shared/state-lib': {
+      singleton: true,       // ← was false — RECOMMENDED for state libraries
+      strictVersion: true,   // ← throws if version mismatch
+      requiredVersion: 'auto',
+    },
   },
 };
 ```
 
-Then publish and let CI/CD propagate (see [Section 11](#11-centralised-federation-config--sharedfederation-config)).
+Then publish and let CI/CD propagate (see [Section 12](#12-centralised-federation-config--sharedfederation-config)).
 
 ### How singleton resolution works at runtime
 
@@ -913,6 +934,7 @@ For singleton mode to work cleanly, all MFEs must have the same version of the l
 ```bash
 # In each MFE repo — update to the same version
 npm install @shared/component-library@1.2.0
+npm install @shared/state-lib@1.1.0
 
 # Restart all servers after reinstalling
 ```
@@ -923,6 +945,11 @@ To go back to each MFE using its own copy, update `federation-config/index.js`:
 
 ```js
 '@shared/component-library': {
+  singleton: false,
+  strictVersion: false,
+  requiredVersion: 'auto',
+},
+'@shared/state-lib': {
   singleton: false,
   strictVersion: false,
   requiredVersion: 'auto',

@@ -9,11 +9,14 @@ This package lives in its own git repository and is published to your private np
 ## How it works
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│           @shared/federation-config  (this repo)            │
-│                      index.js                               │
-│   sharedLibraries: { '@shared/component-library': {...} }   │
-└──────────────────────────┬──────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────┐
+│              @shared/federation-config  (this repo)              │
+│                           index.js                               │
+│   sharedLibraries: {                                             │
+│     '@shared/component-library': {...},                          │
+│     '@shared/state-lib':         {...},                          │
+│   }                                                              │
+└──────────────────────────┬───────────────────────────────────────┘
                            │  published to private registry
               ┌────────────┼────────────┐
               │            │            │
@@ -116,10 +119,15 @@ MFEs remain fully independent. Any MFE can override a specific library by adding
 shared: {
   ...shareAll({ singleton: true, strictVersion: true, requiredVersion: 'auto' }),
   ...sharedLibraries,                    // central defaults
-  '@shared/component-library': {         // this MFE's override
+  '@shared/component-library': {         // override component library for THIS MFE only
     singleton: false,
     strictVersion: false,
     requiredVersion: '1.2.0',            // pin to specific version
+  },
+  '@shared/state-lib': {                 // override state library for THIS MFE only
+    singleton: true,
+    strictVersion: true,
+    requiredVersion: 'auto',
   },
 }
 ```
