@@ -143,4 +143,5 @@ The local entry wins because it comes after the spread.
 
 | Version | Change |
 |---|---|
+| 1.1.0 | Added `@shared/state-lib` — singleton: false |
 | 1.0.0 | Initial release — `@shared/component-library` singleton: false |

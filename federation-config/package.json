@@ -1,6 +1,6 @@
 {
   "name": "@shared/federation-config",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Centralised Native Federation sharing config for all MFEs. Publish a new version to update shared library settings across every MFE without touching individual repos.",
   "main": "index.js",
   "scripts": {

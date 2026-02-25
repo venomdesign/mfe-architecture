@@ -53,12 +53,14 @@ module.exports = {
       requiredVersion: 'auto',
     },
 
-    // ── State Library (example — uncomment when added) ───────────────────────
-    // '@shared/state-library': {
-    //   singleton: false,
-    //   strictVersion: false,
-    //   requiredVersion: 'auto',
-    // },
+    // ── State Library ────────────────────────────────────────────────────────
+    // singleton: false  →  each MFE uses its own installed version independently
+    // Change to true + strictVersion: true to force all MFEs onto one version
+    '@shared/state-lib': {
+      singleton: false,
+      strictVersion: false,
+      requiredVersion: 'auto',
+    },
 
     // ── Any other shared library ─────────────────────────────────────────────
     // 'some-other-library': {

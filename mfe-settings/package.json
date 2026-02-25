@@ -18,6 +18,7 @@
     "@angular/platform-browser": "^20.0.0",
     "@angular/router": "^20.0.0",
     "@shared/component-library": "file:../component-library/dist/component-library",
+    "@shared/state-lib": "file:../shared-state-lib/dist/state-lib",
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1",
     "es-module-shims": "^1.5.12",

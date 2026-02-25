@@ -14,12 +14,13 @@ A reference implementation of a **Micro-Frontend (MFE) architecture** using Angu
 6. [Starting & Stopping Each Project](#6-starting--stopping-each-project)
 7. [Component Library](#7-component-library)
 8. [Component Library Showcase](#8-component-library-showcase)
-9. [Shell App](#9-shell-app)
-10. [Micro-Frontends](#10-micro-frontends)
-11. [Centralised Federation Config — @shared/federation-config](#11-centralised-federation-config--sharedfederation-config)
-12. [Development Workflow](#12-development-workflow)
-13. [Port Reference](#13-port-reference)
-14. [Singleton Mode — Forcing All MFEs onto One Shared Version](#14-singleton-mode--forcing-all-mfes-onto-one-shared-version)
+9. [Shared State Library](#9-shared-state-library)
+10. [Shell App](#10-shell-app)
+11. [Micro-Frontends](#11-micro-frontends)
+12. [Centralised Federation Config — @shared/federation-config](#12-centralised-federation-config--sharedfederation-config)
+13. [Development Workflow](#13-development-workflow)
+14. [Port Reference](#14-port-reference)
+15. [Singleton Mode — Forcing All MFEs onto One Shared Version](#15-singleton-mode--forcing-all-mfes-onto-one-shared-version)
 
 ---
 
@@ -78,6 +79,14 @@ mfe-architecture/
 │   │       └── alert/            # UiAlertComponent
 │   ├── ng-package.json           # ng-packagr config → builds to dist/
 │   └── package.json              # name: @shared/component-library
+│
+├── shared-state-lib/             # Standalone Angular library (ng-packagr)
+│   ├── src/
+│   │   ├── public-api.ts         # Barrel export for all services
+│   │   └── lib/
+│   │       └── app-state/        # AppStateService (signal-based)
+│   ├── ng-package.json           # ng-packagr config → builds to dist/
+│   └── package.json              # name: @shared/state-lib
 │
 ├── component-library-showcase/   # Angular app — visual docs for the library
 │   └── src/app/pages/            # One page per component (buttons, badges…)
@@ -211,7 +220,7 @@ The component library is configured separately with `singleton: false`:
 
 ## 5. First-Time Setup
 
-> **Order matters.** The component library must be built before any consuming project runs `npm install`.
+> **Order matters.** Both shared libraries must be built before any consuming project runs `npm install`.
 
 ### 1. Build the component library
 
@@ -223,13 +232,23 @@ npm run build
 
 The compiled library is now at `component-library/dist/component-library/`.
 
-### 2. Install dependencies for each project
+### 2. Build the shared state library
+
+```bash
+cd ../shared-state-lib
+npm install
+npm run build
+```
+
+The compiled library is now at `shared-state-lib/dist/state-lib/`.
+
+### 3. Install dependencies for each project
 
 Open a separate terminal for each project (or run sequentially):
 
 ```bash
 # Component library showcase
-cd component-library-showcase
+cd ../component-library-showcase
 npm install
 
 # Shell app
@@ -245,7 +264,7 @@ cd ../mfe-settings
 npm install
 ```
 
-> If you ever rebuild the component library (e.g. after adding a new component), you must re-run `npm install` in every consuming project to pick up the updated build.
+> If you ever rebuild either shared library, you must re-run `npm install` in every consuming project to pick up the updated build.
 
 ---
 
@@ -442,7 +461,118 @@ Open **http://localhost:4300**
 
 ---
 
-## 9. Shell App
+## 9. Shared State Library
+
+**Location:** `shared-state-lib/`  
+**Package name:** `@shared/state-lib`  
+**Version:** `1.0.0`  
+**Build tool:** `ng-packagr`
+
+The shared state library provides a platform-wide, signal-based state store that can be shared across the shell and all MFEs. It follows the exact same structure and federation config pattern as `@shared/component-library`.
+
+### Exported services
+
+| Service | Description |
+|---|---|
+| `AppStateService` | Signal-based store for user, theme, and notification state |
+| `AppState` | Interface — top-level state shape |
+| `UserState` | Interface — authenticated user shape |
+
+All exports are available from `src/public-api.ts`.
+
+### AppStateService API
+
+```ts
+import { inject } from '@angular/core';
+import { AppStateService } from '@shared/state-lib';
+
+const state = inject(AppStateService);
+
+// ── Read (reactive signals) ───────────────────────────────────────────────────
+state.state()            // full AppState snapshot
+state.user()             // UserState | null
+state.theme()            // 'light' | 'dark'
+state.notifications()    // number
+state.isAuthenticated()  // boolean
+
+// ── Write ─────────────────────────────────────────────────────────────────────
+state.setUser({ id: '1', name: 'Alice', email: 'alice@example.com' });
+state.setUser(null);                  // sign out
+state.setTheme('dark');
+state.incrementNotifications();
+state.clearNotifications();
+state.patchState({ theme: 'dark', notifications: 3 });
+```
+
+`AppStateService` is provided in root (`providedIn: 'root'`). When the library is configured as a **singleton** in the federation config, the shell and all MFEs share the exact same service instance — state changes in one MFE are immediately visible in all others.
+
+### Build commands
+
+```bash
+cd shared-state-lib
+
+# Install dependencies (first time only)
+npm install
+
+# Production build (one-time)
+npm run build
+
+# Watch mode (rebuilds on every save)
+npm run build:watch
+```
+
+The compiled library is output to `shared-state-lib/dist/state-lib/`.
+
+### Consuming projects
+
+| Project | Dependency entry |
+|---|---|
+| `shell-app` | `"@shared/state-lib": "file:../shared-state-lib/dist/state-lib"` |
+| `mfe-dashboard` | `"@shared/state-lib": "file:../shared-state-lib/dist/state-lib"` |
+| `mfe-settings` | `"@shared/state-lib": "file:../shared-state-lib/dist/state-lib"` |
+
+### Federation config
+
+`@shared/state-lib` is registered in `federation-config/index.js` alongside `@shared/component-library`:
+
+```js
+sharedLibraries: {
+  '@shared/component-library': {
+    singleton: false,
+    strictVersion: false,
+    requiredVersion: 'auto',
+  },
+  '@shared/state-lib': {
+    singleton: false,      // ← change to true to share one instance across all MFEs
+    strictVersion: false,
+    requiredVersion: 'auto',
+  },
+},
+```
+
+> **Singleton mode is especially important for a state library.** When `singleton: false`, each MFE gets its own isolated state store — changes in one MFE are invisible to others. When `singleton: true`, all MFEs and the shell share a single `AppStateService` instance, enabling true cross-MFE state sharing. See [Section 15](#15-singleton-mode--forcing-all-mfes-onto-one-shared-version).
+
+### First-time setup
+
+The state library must be built before any consuming project runs `npm install` (same rule as the component library):
+
+```bash
+cd shared-state-lib
+npm install
+npm run build
+```
+
+Then re-run `npm install` in each consuming project:
+
+```bash
+cd shell-app && npm install
+cd ../mfe-dashboard && npm install
+cd ../mfe-settings && npm install
+```
+
+---
+
+## 10. Shell App
 
 **Location:** `shell-app/`  
 **Port:** `4200`  
@@ -481,7 +611,7 @@ Open **http://localhost:4200**
 
 ---
 
-## 10. Micro-Frontends
+## 11. Micro-Frontends
 
 Both MFEs follow the same pattern.
 
@@ -531,7 +661,7 @@ Each MFE can also be opened directly in a browser at its own port for standalone
 
 ---
 
-## 11. Centralised Federation Config — @shared/federation-config
+## 12. Centralised Federation Config — @shared/federation-config
 
 ### The problem
 
@@ -676,7 +806,7 @@ The federation protocol is a **build-time contract**. Each repo must declare its
 
 ---
 
-## 12. Development Workflow
+## 13. Development Workflow
 
 ### Adding a new component to the library
 
@@ -728,7 +858,7 @@ The federation protocol is a **build-time contract**. Each repo must declare its
 
 ---
 
-## 13. Port Reference
+## 14. Port Reference
 
 | Project | Port | URL |
 |---|---|---|
@@ -741,7 +871,7 @@ The federation protocol is a **build-time contract**. Each repo must declare its
 
 ---
 
-## 14. Singleton Mode — Forcing All MFEs onto One Shared Version
+## 15. Singleton Mode — Forcing All MFEs onto One Shared Version
 
 By default, `@shared/federation-config` sets `singleton: false` — each MFE bundles its own independent copy of every shared library. This is the safe default: different MFEs can run different versions without conflict.
 
