@@ -1,8 +1,10 @@
 /* Global styles for the component library showcase */
+/* Font family and base typography are set by @shared/component-library styles  */
+/* (component-library/src/styles/index.scss → _typography.scss)                 */
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--cl-font-family);
   background-color: #f8f9fa;
 }
 
@@ -50,8 +52,8 @@ body {
 
   &.active {
     color: #fff;
-    background: rgba(99, 102, 241, 0.3);
-    border-left: 3px solid #6366f1;
+    background: rgba(0, 82, 136, 0.3);
+    border-left: 3px solid var(--cl-color-primary);
   }
 
   i { width: 20px; }
@@ -93,8 +95,8 @@ body {
 /* Version badge in sidebar */
 .version-badge {
   display: inline-block;
-  background: rgba(99, 102, 241, 0.2);
-  color: #818cf8;
+  background: rgba(0, 82, 136, 0.2);
+  color: var(--cl-primary-300);   /* #66c2ff — light shade visible on dark sidebar */
   border-radius: 4px;
   padding: 2px 8px;
   font-size: 0.75rem;

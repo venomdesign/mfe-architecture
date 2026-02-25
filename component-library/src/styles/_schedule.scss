@@ -1,0 +1,81 @@
+// ─── Syncfusion EJ2 Schedule overrides ────────────────────────────────────────
+// Applies --cl-* tokens to the Syncfusion Scheduler rendered by
+// UiScheduleComponent. Targets global .e-schedule classes.
+// No SCSS imports needed — tokens come from :root.
+// ──────────────────────────────────────────────────────────────────────────────
+
+.e-schedule {
+  font-family: var(--cl-font-family) !important;
+  border-color: var(--cl-color-border);
+  border-radius: var(--cl-radius-md);
+  overflow: hidden;
+
+  // ── Header toolbar ──────────────────────────────────────────────────────────
+  .e-schedule-toolbar,
+  .e-toolbar {
+    font-family: var(--cl-font-family) !important;
+    border-bottom-color: var(--cl-color-border);
+
+    .e-tbar-btn,
+    .e-toolbar-item .e-tbar-btn-text {
+      font-family: var(--cl-font-family) !important;
+    }
+  }
+
+  // ── Date / column headers ───────────────────────────────────────────────────
+  .e-header-cells,
+  .e-date-header-wrap .e-header-cells,
+  .e-all-day-cells {
+    font-family: var(--cl-font-family) !important;
+    font-weight: 500;
+    font-size: 0.8125rem;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--cl-color-text-muted);
+  }
+
+  // ── Time column ─────────────────────────────────────────────────────────────
+  .e-time-cells-wrap .e-time-cells,
+  .e-time-slot-row .e-time-cells {
+    font-family: var(--cl-font-family) !important;
+    font-size: 0.75rem;
+    color: var(--cl-color-text-muted);
+  }
+
+  // ── Event appointments ──────────────────────────────────────────────────────
+  .e-appointment {
+    font-family: var(--cl-font-family) !important;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    border-radius: var(--cl-radius-sm);
+    border-left: 3px solid rgba(0, 0, 0, 0.2);
+
+    .e-appointment-details,
+    .e-subject {
+      font-family: var(--cl-font-family) !important;
+    }
+  }
+
+  // ── Today highlight ─────────────────────────────────────────────────────────
+  .e-current-day,
+  .e-current-date .e-date-header {
+    color: var(--cl-color-primary);
+    font-weight: 700;
+  }
+
+  // ── Work cells ──────────────────────────────────────────────────────────────
+  .e-work-cells {
+    border-color: var(--cl-color-border);
+  }
+
+  // ── Month view cells ────────────────────────────────────────────────────────
+  .e-month-view .e-date-header {
+    font-family: var(--cl-font-family) !important;
+    font-size: 0.875rem;
+  }
+}
+
+// Host element
+ui-schedule {
+  display: block;
+}

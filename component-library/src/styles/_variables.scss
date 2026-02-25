@@ -1,0 +1,42 @@
+// ─── @shared/component-library — Design Tokens ────────────────────────────────
+// All tokens are CSS custom properties so they can be:
+//   • Overridden at runtime (theming, dark mode) with a single :root block
+//   • Used inside Angular component styles without any SCSS @use imports
+//   • Inspected and patched in DevTools without a rebuild
+//
+// Naming convention: --cl-<category>-<name>
+// ──────────────────────────────────────────────────────────────────────────────
+@use 'color-map' as *;
+
+:root {
+  // ── Primary colour scale — --cl-primary-100 … --cl-primary-900 ──────────────
+  // Generated from $cl-primary-palette (base: #005288) via cl-color-scale()
+  @include cl-color-scale('primary', $cl-primary-palette);
+
+  // ── Typography ──────────────────────────────────────────────────────────────
+  --cl-font-family:    'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --cl-font-size-base: 0.9375rem;  // 15px
+  --cl-line-height:    1.6;
+
+  // ── Semantic colour aliases ──────────────────────────────────────────────────
+  // Point to specific palette shades so consumers use one token name
+  // and the shade can be changed in one place.
+  --cl-color-primary:       var(--cl-primary-600);   // #005288
+  --cl-color-primary-dark:  var(--cl-primary-700);   // #003d66
+  --cl-color-primary-alpha: rgba(0, 82, 136, 0.1);   // #005288 @ 10%
+  --cl-color-primary-focus: rgba(0, 82, 136, 0.35);  // #005288 @ 35% — focus rings
+
+  --cl-color-border:      #e2e8f0;
+  --cl-color-text:        #1e293b;
+  --cl-color-text-muted:  #64748b;
+  --cl-color-surface:     #ffffff;
+  --cl-color-surface-alt: #f8f9fa;
+
+  // ── Shape ───────────────────────────────────────────────────────────────────
+  --cl-radius-sm: 4px;
+  --cl-radius-md: 6px;
+  --cl-radius-lg: 10px;
+
+  // ── Motion ──────────────────────────────────────────────────────────────────
+  --cl-transition: all 0.15s ease;
+}

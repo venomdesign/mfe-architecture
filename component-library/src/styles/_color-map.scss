@@ -1,0 +1,43 @@
+// ─── @shared/component-library — Primary Colour Palette ───────────────────────
+// Base: #005288 (deep blue) — HSL(204°, 100%, 26.7%)
+//
+// Shades are generated along the same hue/saturation axis:
+//   100 (lightest, near-white tint) → 900 (darkest, near-black shade)
+//   600 is the base colour (#005288).
+//
+// Usage — generate CSS custom properties inside :root:
+//   :root { @include cl-color-scale('primary', $cl-primary-palette); }
+//   → --cl-primary-100: #e6f5ff … --cl-primary-900: #001c2e
+// ──────────────────────────────────────────────────────────────────────────────
+
+/// Primary colour scale map — 100 to 900
+/// @type Map
+$cl-primary-palette: (
+  100: #e6f5ff,   // hsl(204, 100%, 95%) — near-white tint
+  200: #b3e1ff,   // hsl(204, 100%, 85%)
+  300: #66c2ff,   // hsl(204, 100%, 70%)
+  400: #1aa3ff,   // hsl(204, 100%, 55%)
+  500: #007acc,   // hsl(204, 100%, 40%)
+  600: #005288,   // hsl(204, 100%, 27%) — base ← #005288
+  700: #003d66,   // hsl(204, 100%, 20%)
+  800: #002b47,   // hsl(204, 100%, 14%)
+  900: #001c2e,   // hsl(204, 100%, 9%)  — near-black shade
+) !default;
+
+/// Outputs a CSS custom property for every shade in a colour palette map.
+///
+/// @param {String} $name    — token name segment (e.g. 'primary')
+/// @param {Map}    $palette — SCSS map of (shade: colour) pairs
+///
+/// @example scss — inside :root
+///   @include cl-color-scale('primary', $cl-primary-palette);
+///   // Outputs:
+///   // --cl-primary-100: #e6f5ff;
+///   // --cl-primary-200: #b3e1ff;
+///   // … through …
+///   // --cl-primary-900: #001c2e;
+@mixin cl-color-scale($name, $palette) {
+  @each $shade, $value in $palette {
+    --cl-#{$name}-#{$shade}: #{$value};
+  }
+}

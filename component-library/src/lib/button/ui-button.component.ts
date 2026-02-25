@@ -11,7 +11,7 @@ import { Component, Input } from '@angular/core';
   selector: 'ui-button',
   standalone: true,
   template: `
-    <button [class]="buttonClass" [disabled]="true" [type]="type">
+    <button [class]="buttonClass" [disabled]="disabled" [type]="type">
       <ng-content></ng-content>
     </button>
   `,

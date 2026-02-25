@@ -1,0 +1,43 @@
+// ─── Bootstrap .card overrides ────────────────────────────────────────────────
+// Applies --cl-* tokens to all Bootstrap card variants rendered by
+// UiCardComponent. No SCSS imports needed — tokens come from :root.
+// ──────────────────────────────────────────────────────────────────────────────
+
+.card {
+  font-family: var(--cl-font-family);
+  border-color: var(--cl-color-border);
+  border-radius: var(--cl-radius-lg);
+  overflow: hidden;
+  transition: var(--cl-transition);
+
+  .card-header {
+    font-weight: 500;
+    font-size: var(--cl-font-size-base);
+    padding: 0.875rem 1.25rem;
+    border-bottom-color: var(--cl-color-border);
+    background-color: var(--cl-color-surface-alt);
+
+    small.text-muted {
+      font-weight: 400;
+      color: var(--cl-color-text-muted) !important;
+    }
+  }
+
+  .card-body {
+    padding: 1.25rem;
+    color: var(--cl-color-text);
+  }
+
+  .card-footer {
+    padding: 0.75rem 1.25rem;
+    border-top-color: var(--cl-color-border);
+    background-color: var(--cl-color-surface-alt);
+    font-size: 0.875rem;
+    color: var(--cl-color-text-muted);
+  }
+}
+
+// Host element
+ui-card {
+  display: block;
+}

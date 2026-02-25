@@ -1,0 +1,23 @@
+// ─── Bootstrap .badge overrides ───────────────────────────────────────────────
+// Applies --cl-* tokens to all Bootstrap badge variants rendered by
+// UiBadgeComponent. No SCSS imports needed — tokens come from :root.
+// ──────────────────────────────────────────────────────────────────────────────
+
+.badge {
+  font-family: var(--cl-font-family);
+  font-weight: 500;
+  font-size: 0.75em;
+  letter-spacing: 0.03em;
+  border-radius: var(--cl-radius-sm);
+  padding: 0.3em 0.6em;
+}
+
+.badge.rounded-pill {
+  border-radius: 50rem;
+}
+
+// Host element
+ui-badge {
+  display: inline-flex;
+  align-items: center;
+}

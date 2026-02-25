@@ -1,0 +1,35 @@
+// ─── Bootstrap .alert overrides ───────────────────────────────────────────────
+// Applies --cl-* tokens to all Bootstrap alert variants rendered by
+// UiAlertComponent. No SCSS imports needed — tokens come from :root.
+// ──────────────────────────────────────────────────────────────────────────────
+
+.alert {
+  font-family: var(--cl-font-family);
+  border-radius: var(--cl-radius-md);
+  font-size: 0.9rem;
+  padding: 0.875rem 1rem;
+
+  // Accent left border — gives each alert a coloured left edge
+  border-width: 1px;
+  border-left-width: 4px;
+
+  strong {
+    font-weight: 500;
+  }
+
+  // Dismiss button
+  .btn-close {
+    padding: 0.25rem;
+    opacity: 0.6;
+    transition: var(--cl-transition);
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
+// Host element
+ui-alert {
+  display: block;
+}

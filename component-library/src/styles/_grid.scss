@@ -1,0 +1,80 @@
+// ─── Syncfusion EJ2 Grid overrides ────────────────────────────────────────────
+// Applies --cl-* tokens to the Syncfusion Grid rendered by UiGridComponent.
+// Targets global .e-grid classes (Syncfusion renders outside Angular's shadow).
+// No SCSS imports needed — tokens come from :root.
+// ──────────────────────────────────────────────────────────────────────────────
+
+.e-grid {
+  font-family: var(--cl-font-family) !important;
+  border-color: var(--cl-color-border);
+  border-radius: var(--cl-radius-md);
+  overflow: hidden;
+
+  // ── Column headers ──────────────────────────────────────────────────────────
+  .e-headercell,
+  .e-columnheader .e-headercell {
+    font-family: var(--cl-font-family) !important;
+    font-weight: 500;
+    font-size: 0.8125rem;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--cl-color-text-muted);
+  }
+
+  .e-headercelldiv {
+    font-family: var(--cl-font-family) !important;
+  }
+
+  // ── Data rows ───────────────────────────────────────────────────────────────
+  .e-rowcell {
+    font-family: var(--cl-font-family) !important;
+    font-size: 0.9rem;
+    color: var(--cl-color-text);
+    border-color: var(--cl-color-border);
+  }
+
+  // Hover
+  .e-row:hover .e-rowcell {
+    background-color: var(--cl-color-primary-alpha);
+  }
+
+  // Selected row
+  .e-selectionbackground,
+  .e-active {
+    background-color: var(--cl-color-primary-alpha) !important;
+  }
+
+  // ── Pager ───────────────────────────────────────────────────────────────────
+  .e-pager {
+    font-family: var(--cl-font-family) !important;
+    font-size: 0.875rem;
+    border-top-color: var(--cl-color-border);
+    color: var(--cl-color-text-muted);
+
+    .e-currentitem {
+      background-color: var(--cl-color-primary);
+      border-color: var(--cl-color-primary);
+    }
+  }
+
+  // ── Toolbar ─────────────────────────────────────────────────────────────────
+  .e-toolbar {
+    font-family: var(--cl-font-family) !important;
+    border-bottom-color: var(--cl-color-border);
+
+    .e-toolbar-item .e-tbar-btn {
+      font-family: var(--cl-font-family) !important;
+    }
+  }
+
+  // ── Filter row ──────────────────────────────────────────────────────────────
+  .e-filterbar .e-filterbarcell input {
+    font-family: var(--cl-font-family) !important;
+    font-size: 0.875rem;
+  }
+}
+
+// Host element
+ui-grid {
+  display: block;
+}

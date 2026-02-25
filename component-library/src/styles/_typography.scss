@@ -1,0 +1,26 @@
+// ─── Typography ───────────────────────────────────────────────────────────────
+// Loads Roboto from Google Fonts and applies it as the base font via the
+// --cl-font-family token defined in _variables.scss.
+// ──────────────────────────────────────────────────────────────────────────────
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap');
+
+html,
+body {
+  font-family: var(--cl-font-family);
+  font-size: var(--cl-font-size-base);
+  line-height: var(--cl-line-height);
+  color: var(--cl-color-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--cl-font-family);
+  font-weight: 500;
+  color: var(--cl-color-text);
+}
+
+p, li, td, th, label, input, select, textarea {
+  font-family: var(--cl-font-family);
+}
