@@ -513,7 +513,7 @@ The Compodoc build is controlled by `component-library/.compodocrc.json`:
   "tsconfig": "./tsconfig.json",
   "output": "../component-library-showcase/public/docs",
   "name": "@shared/component-library",
-  "theme": "material",
+  "theme": "default",
   "disablePrivate": true,
   "disableInternal": true,
   "disableRoutesGraph": true,
@@ -524,7 +524,7 @@ The Compodoc build is controlled by `component-library/.compodocrc.json`:
 | Option | Effect |
 |---|---|
 | `output` | Writes directly into the showcase's `public/docs/` folder |
-| `theme: "material"` | Material Design theme for the Compodoc UI |
+| `theme: "default"` | Default Compodoc theme (no Material Design dependency) |
 | `disablePrivate` | Hides private class members from the docs |
 | `disableInternal` | Hides members tagged `@internal` |
 | `disableRoutesGraph` | Suppresses the Angular routes graph (not relevant for a library) |
