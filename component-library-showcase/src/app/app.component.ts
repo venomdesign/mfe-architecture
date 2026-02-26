@@ -66,8 +66,9 @@ import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
             </span>
           </div>
 
-          <a routerLink="/api-docs" routerLinkActive="active" class="nav-link d-flex align-items-center gap-2">
+          <a href="/docs/index.html" target="_blank" rel="noopener" class="nav-link d-flex align-items-center gap-2">
             <i class="bi bi-file-earmark-code"></i> API Docs
+            <i class="bi bi-box-arrow-up-right ms-auto" style="font-size:0.7rem;opacity:0.5"></i>
           </a>
         </nav>
 

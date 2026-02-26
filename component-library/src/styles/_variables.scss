@@ -9,9 +9,19 @@
 @use 'color-map' as *;
 
 :root {
-  // ── Primary colour scale — --cl-primary-100 … --cl-primary-900 ──────────────
-  // Generated from $cl-primary-palette (base: #005288) via cl-color-scale()
-  @include cl-color-scale('primary', $cl-primary-palette);
+  // ── Colour scales ────────────────────────────────────────────────────────────
+  // Each @include emits --cl-<name>-100 … --cl-<name>-900
+
+  @include cl-color-scale('primary',    $cl-primary-palette);
+  @include cl-color-scale('secondary',  $cl-secondary-palette);
+  @include cl-color-scale('red',        $cl-red-palette);
+  @include cl-color-scale('yellow',     $cl-yellow-palette);
+  @include cl-color-scale('green',      $cl-green-palette);
+  @include cl-color-scale('light-blue', $cl-light-blue-palette);
+
+  // Both spellings for grey/gray — identical values, two sets of tokens
+  @include cl-color-scale('grey',       $cl-grey-palette);
+  @include cl-color-scale('gray',       $cl-gray-palette);
 
   // ── Typography ──────────────────────────────────────────────────────────────
   --cl-font-family:    'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -19,13 +29,47 @@
   --cl-line-height:    1.6;
 
   // ── Semantic colour aliases ──────────────────────────────────────────────────
-  // Point to specific palette shades so consumers use one token name
-  // and the shade can be changed in one place.
+  // Primary
   --cl-color-primary:       var(--cl-primary-600);   // #005288
   --cl-color-primary-dark:  var(--cl-primary-700);   // #003d66
+  --cl-color-primary-light: var(--cl-primary-300);   // #66c2ff
   --cl-color-primary-alpha: rgba(0, 82, 136, 0.1);   // #005288 @ 10%
   --cl-color-primary-focus: rgba(0, 82, 136, 0.35);  // #005288 @ 35% — focus rings
 
+  // Secondary (inverse of primary)
+  --cl-color-secondary:       var(--cl-secondary-600);  // #8a3700
+  --cl-color-secondary-dark:  var(--cl-secondary-700);  // #662900
+  --cl-color-secondary-light: var(--cl-secondary-300);  // #ffad77 — exact inverse of primary
+
+  // Red
+  --cl-color-red:       var(--cl-red-600);   // #c41230
+  --cl-color-red-dark:  var(--cl-red-700);   // #950e24
+  --cl-color-red-light: var(--cl-red-300);   // #f27388
+
+  // Yellow
+  --cl-color-yellow:       var(--cl-yellow-600);   // #ffd639
+  --cl-color-yellow-dark:  var(--cl-yellow-800);   // #b38f00
+  --cl-color-yellow-light: var(--cl-yellow-300);   // #ffec99
+
+  // Green
+  --cl-color-green:       var(--cl-green-600);   // #477326
+  --cl-color-green-dark:  var(--cl-green-700);   // #304d1a
+  --cl-color-green-light: var(--cl-green-300);   // #add98c
+
+  // Light Blue
+  --cl-color-light-blue:       var(--cl-light-blue-600);   // #00a9f5
+  --cl-color-light-blue-dark:  var(--cl-light-blue-700);   // #007ab3
+  --cl-color-light-blue-light: var(--cl-light-blue-300);   // #66cfff
+
+  // Grey / Gray (both aliases point to the same value)
+  --cl-color-grey:       var(--cl-grey-600);   // #72775b
+  --cl-color-grey-dark:  var(--cl-grey-700);   // #535643
+  --cl-color-grey-light: var(--cl-grey-300);   // #b9bca9
+  --cl-color-gray:       var(--cl-gray-600);
+  --cl-color-gray-dark:  var(--cl-gray-700);
+  --cl-color-gray-light: var(--cl-gray-300);
+
+  // ── Neutral surface tokens ───────────────────────────────────────────────────
   --cl-color-border:      #e2e8f0;
   --cl-color-text:        #1e293b;
   --cl-color-text-muted:  #64748b;
