@@ -47,6 +47,7 @@
               "node_modules/@syncfusion/ej2-grids/styles/bootstrap5.css",
               "node_modules/@syncfusion/ej2-calendars/styles/bootstrap5.css",
               "node_modules/@syncfusion/ej2-schedule/styles/bootstrap5.css",
+              "node_modules/@syncfusion/ej2-documenteditor/styles/bootstrap5.css",
               "../component-library/src/styles/index.scss",
               "src/styles.scss"
             ],

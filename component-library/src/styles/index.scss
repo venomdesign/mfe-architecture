@@ -20,23 +20,25 @@
 //     ]
 //
 // ── Load order ────────────────────────────────────────────────────────────────
-//   1. color-map  — $cl-primary-palette map + cl-color-scale() mixin (no CSS output)
-//   2. variables  — :root { --cl-* } tokens, calls cl-color-scale()
-//   3. typography — Roboto @import + base font rules
-//   4. button     — Bootstrap .btn overrides
-//   5. badge      — Bootstrap .badge overrides
-//   6. card       — Bootstrap .card overrides
-//   7. alert      — Bootstrap .alert overrides
-//   8. grid       — Syncfusion .e-grid overrides
-//   9. schedule   — Syncfusion .e-schedule overrides
+//   1. color-map       — $cl-primary-palette map + cl-color-scale() mixin (no CSS output)
+//   2. variables       — :root { --cl-* } tokens, calls cl-color-scale()
+//   3. typography      — Roboto @import + base font rules
+//   4. button          — Bootstrap .btn overrides
+//   5. badge           — Bootstrap .badge overrides
+//   6. card            — Bootstrap .card overrides
+//   7. alert           — Bootstrap .alert overrides
+//   8. grid            — Syncfusion .e-grid overrides
+//   9. schedule        — Syncfusion .e-schedule overrides
+//  10. document-editor — Syncfusion .e-documenteditorcontainer overrides
 // ──────────────────────────────────────────────────────────────────────────────
 
-@use 'color-map';   // palette map + mixin — no CSS output (loaded by variables too)
-@use 'variables';   // :root { --cl-* } — must be before components
-@use 'typography';  // Roboto + base font
-@use 'button';      // Bootstrap .btn
-@use 'badge';       // Bootstrap .badge
-@use 'card';        // Bootstrap .card
-@use 'alert';       // Bootstrap .alert
-@use 'grid';        // Syncfusion .e-grid
-@use 'schedule';    // Syncfusion .e-schedule
+@use 'color-map';
+@use 'variables';
+@use 'typography';
+@use 'button';
+@use 'badge';
+@use 'card';
+@use 'alert';
+@use 'grid';
+@use 'schedule';
+@use 'document-editor';

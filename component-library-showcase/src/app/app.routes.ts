@@ -6,6 +6,7 @@ import { CardsComponent } from './pages/cards/cards.component';
 import { AlertsComponent } from './pages/alerts/alerts.component';
 import { GridShowcaseComponent } from './pages/grid/grid.component';
 import { ScheduleShowcaseComponent } from './pages/schedule/schedule.component';
+import { DocumentEditorShowcaseComponent } from './pages/document-editor/document-editor.component';
 import { ApiDocsComponent } from './pages/api-docs/api-docs.component';
 
 export const routes: Routes = [
@@ -41,6 +42,10 @@ export const routes: Routes = [
   {
     path: 'schedule',
     component: ScheduleShowcaseComponent
+  },
+  {
+    path: 'document-editor',
+    component: DocumentEditorShowcaseComponent
   },
   {
     path: 'api-docs',

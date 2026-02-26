@@ -20,6 +20,7 @@
     "@angular/platform-browser": "^20.0.0",
     "@angular/router": "^20.0.0",
     "@shared/component-library": "file:../component-library/dist/component-library",
+    "@syncfusion/ej2-angular-documenteditor": "^29.2.11",
     "@syncfusion/ej2-angular-grids": "^29.2.11",
     "@syncfusion/ej2-angular-schedule": "^29.2.10",
     "bootstrap": "^5.3.8",

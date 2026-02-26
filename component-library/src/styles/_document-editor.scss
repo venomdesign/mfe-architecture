@@ -1,0 +1,73 @@
+// ─── Syncfusion EJ2 Document Editor overrides ─────────────────────────────────
+// Applies --cl-* tokens to the Syncfusion Document Editor Container rendered
+// by UiDocumentEditorComponent.
+// Targets global .e-de-* / .e-documenteditor classes (Syncfusion renders
+// outside Angular's shadow DOM).
+// No SCSS imports needed — tokens come from :root.
+// ──────────────────────────────────────────────────────────────────────────────
+
+// ── Host element ────────────────────────────────────────────────────────────
+ui-document-editor {
+  display: block;
+}
+
+// ── Container shell ─────────────────────────────────────────────────────────
+.e-documenteditorcontainer {
+  font-family: var(--cl-font-family) !important;
+  border-color: var(--cl-color-border);
+  border-radius: var(--cl-radius-md);
+  overflow: hidden;
+
+  // ── Toolbar ───────────────────────────────────────────────────────────────
+  .e-toolbar {
+    font-family: var(--cl-font-family) !important;
+    border-bottom-color: var(--cl-color-border);
+
+    .e-toolbar-item .e-tbar-btn,
+    .e-toolbar-item .e-tbar-btn-text {
+      font-family: var(--cl-font-family) !important;
+      font-size: 0.875rem;
+    }
+  }
+
+  // ── Properties pane ───────────────────────────────────────────────────────
+  .e-de-prop-pane {
+    font-family: var(--cl-font-family) !important;
+    border-left-color: var(--cl-color-border);
+
+    label,
+    .e-de-prop-label {
+      font-family: var(--cl-font-family) !important;
+      font-size: 0.8125rem;
+      color: var(--cl-color-text-muted);
+    }
+  }
+
+  // ── Status bar ────────────────────────────────────────────────────────────
+  .e-de-statusbar {
+    font-family: var(--cl-font-family) !important;
+    font-size: 0.8125rem;
+    border-top-color: var(--cl-color-border);
+    color: var(--cl-color-text-muted);
+  }
+
+  // ── Editor canvas area ────────────────────────────────────────────────────
+  .e-de-cnt {
+    background-color: #f0f0f0;
+  }
+
+  // ── Dialogs ───────────────────────────────────────────────────────────────
+  .e-dialog {
+    font-family: var(--cl-font-family) !important;
+
+    .e-dlg-header {
+      font-family: var(--cl-font-family) !important;
+      font-weight: 600;
+    }
+
+    .e-btn.e-primary {
+      background-color: var(--cl-color-primary);
+      border-color: var(--cl-color-primary);
+    }
+  }
+}
