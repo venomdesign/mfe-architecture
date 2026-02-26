@@ -1,5 +1,8 @@
 import { Injectable, signal, computed } from '@angular/core';
 
+/** Semantic version of @shared/state-lib this instance was compiled from. */
+export const STATE_LIB_VERSION = '1.0.0';
+
 /**
  * Shape of the authenticated user stored in app state.
  */
@@ -39,6 +42,23 @@ export interface AppState {
  */
 @Injectable({ providedIn: 'root' })
 export class AppStateService {
+  /**
+   * Unique ID generated **once** when this service instance is constructed.
+   *
+   * Use this to prove singleton vs non-singleton behaviour at runtime:
+   *
+   * - `singleton: false` → Native Federation creates a separate module scope
+   *   per MFE → `new AppStateService()` runs independently in each MFE →
+   *   **different instanceId values** across MFEs.
+   *
+   * - `singleton: true` → one shared module scope → the service is constructed
+   *   exactly once → **all MFEs show the same instanceId**.
+   */
+  readonly instanceId = Math.random().toString(36).slice(2, 8).toUpperCase();
+
+  /** Version of @shared/state-lib this instance was built from. */
+  readonly libVersion = STATE_LIB_VERSION;
+
   private readonly _state = signal<AppState>({
     user: null,
     theme: 'light',

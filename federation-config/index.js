@@ -20,6 +20,28 @@
  * version or singleton setting (see federation.config.js in each MFE).
  * ─────────────────────────────────────────────────────────────────────────────
  *
+ * ┌─────────────────────────────────────────────────────────────────────────┐
+ * │  SINGLETON MODE QUICK REFERENCE                                         │
+ * │                                                                         │
+ * │  singleton: false  (default)                                            │
+ * │    • Each MFE loads its own copy of the library                         │
+ * │    • Different MFEs can use different versions                          │
+ * │    • State is ISOLATED — AppStateService instances are independent      │
+ * │    • Live proof: Dashboard and Settings show DIFFERENT instanceId       │
+ * │                                                                         │
+ * │  singleton: true                                                        │
+ * │    • All MFEs share ONE loaded copy of the library                      │
+ * │    • All MFEs MUST use the same version (strictVersion enforces this)   │
+ * │    • State is SHARED — one AppStateService instance for the platform    │
+ * │    • Live proof: Dashboard and Settings show the SAME instanceId        │
+ * │                                                                         │
+ * │  To switch ALL MFEs to singleton in one step:                           │
+ * │    1. Change singleton: false → true below                              │
+ * │    2. Change strictVersion: false → true below                          │
+ * │    3. Rebuild shared-state-lib, then rebuild all MFEs                   │
+ * │    See docs/shared-library-versioning.md for the full guide.            │
+ * └─────────────────────────────────────────────────────────────────────────┘
+ *
  * singleton: false  →  each MFE bundles its own copy (independent versions OK)
  * singleton: true   →  all MFEs share ONE instance (all must be same version)
  * strictVersion     →  throw if version mismatch when singleton: true
@@ -45,20 +67,36 @@ module.exports = {
   sharedLibraries: {
 
     // ── Component Library ────────────────────────────────────────────────────
-    // singleton: false  →  each MFE uses its own installed version independently
-    // Change to true + strictVersion: true to force all MFEs onto one version
+    //
+    // CURRENT:  singleton: false
+    //   → Each MFE loads its own copy. MFEs can use different versions.
+    //   → UI components are independent per MFE (safe for gradual upgrades).
+    //
+    // TO FORCE ONE VERSION:  set singleton: true, strictVersion: true
+    //   → All MFEs must have the same version in their package.json.
+    //   → Runtime throws if versions differ (prevents silent mismatches).
+    //
     '@shared/component-library': {
-      singleton: false,
-      strictVersion: false,
+      singleton: false,         // ← change to true to force one version
+      strictVersion: false,     // ← change to true to throw on mismatch
       requiredVersion: 'auto',
     },
 
     // ── State Library ────────────────────────────────────────────────────────
-    // singleton: false  →  each MFE uses its own installed version independently
-    // Change to true + strictVersion: true to force all MFEs onto one version
+    //
+    // CURRENT:  singleton: false
+    //   → Each MFE has its own AppStateService instance (isolated state).
+    //   → AppStateService.instanceId will be DIFFERENT across MFEs.
+    //   → Notification counts, user state etc. are NOT shared between MFEs.
+    //
+    // TO SHARE STATE ACROSS ALL MFEs:  set singleton: true, strictVersion: true
+    //   → One AppStateService instance for the entire platform.
+    //   → AppStateService.instanceId will be the SAME across all MFEs.
+    //   → Incrementing notifications in Dashboard updates count in Settings too.
+    //
     '@shared/state-lib': {
-      singleton: false,
-      strictVersion: false,
+      singleton: false,         // ← change to true to share state across MFEs
+      strictVersion: false,     // ← change to true to throw on mismatch
       requiredVersion: 'auto',
     },
 

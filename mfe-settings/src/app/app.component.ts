@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { AppStateService } from '@shared/state-lib';
 import {
   UiButtonComponent,
   UiBadgeComponent,
@@ -22,6 +23,120 @@ import {
         <ui-badge label="MFE" variant="success"></ui-badge>
         <ui-badge label="Repo: mfe-settings" variant="secondary"></ui-badge>
         <ui-badge label="Port: 4202" variant="info"></ui-badge>
+      </div>
+
+      <!-- ── Shared Library Version Demo ──────────────────────────────────── -->
+      <div class="card border-success mb-4">
+        <div class="card-header bg-success text-white d-flex align-items-center gap-2">
+          <i class="bi bi-diagram-3-fill"></i>
+          <strong>Shared Library Demo — Singleton vs Non-Singleton</strong>
+        </div>
+        <div class="card-body">
+
+          <!-- Library versions row -->
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <div class="p-3 rounded border">
+                <p class="text-muted small mb-1 fw-semibold text-uppercase" style="font-size:.7rem;letter-spacing:.06em">
+                  @shared/state-lib
+                </p>
+                <div class="d-flex align-items-center gap-2 mb-1">
+                  <span class="badge bg-success">v{{ stateService.libVersion }}</span>
+                  <code class="small text-muted">singleton: {{ currentSingletonMode }}</code>
+                </div>
+                <p class="text-muted small mb-0">
+                  Installed via <code>package.json</code> — each MFE can pin a different version.
+                </p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="p-3 rounded border">
+                <p class="text-muted small mb-1 fw-semibold text-uppercase" style="font-size:.7rem;letter-spacing:.06em">
+                  @shared/component-library
+                </p>
+                <div class="d-flex align-items-center gap-2 mb-1">
+                  <span class="badge bg-secondary">v1.0.0</span>
+                  <code class="small text-muted">singleton: {{ currentSingletonMode }}</code>
+                </div>
+                <p class="text-muted small mb-0">
+                  UI components — can differ per MFE when non-singleton.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Instance ID — the live proof -->
+          <div class="p-3 rounded mb-3" style="background:#f0fff4;border:2px solid #198754">
+            <div class="d-flex align-items-start gap-3">
+              <div class="flex-grow-1">
+                <p class="fw-bold mb-1" style="color:#198754">
+                  <i class="bi bi-fingerprint me-1"></i>AppStateService Instance ID
+                </p>
+                <div class="d-flex align-items-center gap-2 mb-2">
+                  <span class="font-monospace fs-4 fw-bold" style="color:#198754;letter-spacing:.15em">
+                    {{ stateService.instanceId }}
+                  </span>
+                  <span class="badge bg-success">Settings MFE</span>
+                </div>
+                <p class="text-muted small mb-0">
+                  Compare this ID with the Dashboard MFE:
+                  <strong>same ID = singleton (shared instance)</strong>,
+                  <strong>different ID = non-singleton (isolated instance)</strong>.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Notification counter — live state proof -->
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <div class="p-3 rounded border">
+                <p class="text-muted small mb-1 fw-semibold text-uppercase" style="font-size:.7rem;letter-spacing:.06em">
+                  Notification Count (this instance)
+                </p>
+                <div class="d-flex align-items-center gap-3">
+                  <span class="display-6 fw-bold">{{ stateService.notifications() }}</span>
+                  <div class="d-flex flex-column gap-1">
+                    <button class="btn btn-success btn-sm" (click)="stateService.incrementNotifications()">
+                      <i class="bi bi-plus-lg me-1"></i>Increment
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm" (click)="stateService.clearNotifications()">
+                      <i class="bi bi-x-lg me-1"></i>Reset
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="p-3 rounded border h-100">
+                <p class="text-muted small mb-1 fw-semibold text-uppercase" style="font-size:.7rem;letter-spacing:.06em">
+                  What to observe
+                </p>
+                <ul class="small mb-0">
+                  <li class="mb-1">
+                    <strong>singleton: false</strong> — increment in Dashboard MFE, come here.
+                    Count stays at 0. <em>Isolated instances.</em>
+                  </li>
+                  <li>
+                    <strong>singleton: true</strong> — increment in Dashboard MFE, come here.
+                    Count matches. <em>Shared instance.</em>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- How to switch -->
+          <div class="alert alert-warning mb-0 d-flex align-items-start gap-2">
+            <i class="bi bi-gear-fill mt-1"></i>
+            <div>
+              <strong>To force singleton mode:</strong> open
+              <code>federation-config/index.js</code> and set
+              <code>singleton: true, strictVersion: true</code> for both libraries,
+              then rebuild all MFEs. See <code>docs/shared-library-versioning.md</code> for full instructions.
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Settings Sections using UiCard + UiButton -->
@@ -133,4 +248,9 @@ import {
     </div>
   `
 })
-export class AppComponent {}
+export class AppComponent {
+  readonly stateService = inject(AppStateService);
+
+  /** Reflects the current federation-config setting for display purposes. */
+  readonly currentSingletonMode = 'false';
+}
